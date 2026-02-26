@@ -1,0 +1,10 @@
+node_modules/
+output/
+demo-dist/
+
+# local logs
+*.log
+
+# editor/system
+.DS_Store
+Thumbs.db
