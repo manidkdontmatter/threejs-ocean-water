@@ -21,7 +21,7 @@ import {
 import { Ocean, createDefaultOceanOptions, type OceanSettings } from "./lib";
 import { OceanSky } from "./lib/sky";
 import { applyBuoyancyToRigidBody, createBoxBuoyancyProbes } from "./lib/rapier";
-import { createOceanGui } from "./ui/createOceanGui";
+import { createOceanGui, type OceanTimeControls } from "./ui/createOceanGui";
 
 declare global {
   interface Window {
@@ -68,6 +68,12 @@ if (!app) {
 const cameraReadout = document.querySelector<HTMLParagraphElement>("#camera-readout");
 
 const settings: OceanSettings = createDefaultOceanOptions();
+const timeControls: OceanTimeControls = {
+  simulationSpeed: 1.0,
+  paused: false,
+  useServerTime: false,
+  serverTimeSec: 0.0
+};
 
 const scene = new Scene();
 scene.background = new Color("#95b9d6");
@@ -95,7 +101,11 @@ scene.add(skyDome.object3d);
 
 const gui = createOceanGui({
   settings,
+  timeControls,
   onRebuildGeometry: () => {
+    ocean.setOptions(settings);
+  },
+  onSettingsChanged: () => {
     ocean.setOptions(settings);
   }
 });
@@ -374,17 +384,17 @@ function requestMouseLook(): void {
 }
 
 function advanceClock(dtSec: number, forceAdvance: boolean): number {
-  if (settings.useServerTime) {
-    if (forceAdvance || !settings.paused) {
-      settings.serverTimeSec += dtSec * settings.simulationSpeed;
+  if (timeControls.useServerTime) {
+    if (forceAdvance || !timeControls.paused) {
+      timeControls.serverTimeSec += dtSec * timeControls.simulationSpeed;
     }
-    simTimeSec = settings.serverTimeSec;
-    return forceAdvance || !settings.paused ? dtSec * settings.simulationSpeed : 0;
+    simTimeSec = timeControls.serverTimeSec;
+    return forceAdvance || !timeControls.paused ? dtSec * timeControls.simulationSpeed : 0;
   }
 
-  if (forceAdvance || !settings.paused) {
-    simTimeSec += dtSec * settings.simulationSpeed;
-    return dtSec * settings.simulationSpeed;
+  if (forceAdvance || !timeControls.paused) {
+    simTimeSec += dtSec * timeControls.simulationSpeed;
+    return dtSec * timeControls.simulationSpeed;
   }
 
   return 0;
@@ -434,8 +444,6 @@ function runFixedPhysics(dtSec: number): void {
 
 function updateSimulation(dtSec: number, forceAdvance = false): void {
   updateFlyMovement(dtSec);
-
-  ocean.setOptions(settings);
 
   const advancedDtSec = advanceClock(dtSec, forceAdvance);
   runFixedPhysics(advancedDtSec);
@@ -589,8 +597,8 @@ window.sampleOceanHeight = (x: number, z: number, atTimeSec?: number): number =>
 };
 
 window.setOceanServerTime = (timeSec: number): void => {
-  settings.useServerTime = true;
-  settings.serverTimeSec = timeSec;
+  timeControls.useServerTime = true;
+  timeControls.serverTimeSec = timeSec;
   simTimeSec = timeSec;
 };
 
@@ -605,6 +613,7 @@ window.__oceanDebug = {
     if (typeof followSnap === "number" && Number.isFinite(followSnap)) {
       settings.followSnap = Math.max(0.001, followSnap);
     }
+    ocean.setOptions(settings);
     updateSimulation(0, true);
     render();
   },
@@ -660,7 +669,7 @@ window.render_game_to_text = (): string => {
     },
     ocean: {
       timeSec: Number(simTimeSec.toFixed(4)),
-      serverTimeMode: settings.useServerTime,
+      serverTimeMode: timeControls.useServerTime,
       displacementOctaves: settings.displacementOctaves,
       normalOctaves: settings.normalOctaves,
       ringCount: settings.ringCount,
@@ -701,7 +710,7 @@ window.render_game_to_text = (): string => {
     debug: {
       wireframe: settings.wireframe,
       debugView: settings.debugView,
-      paused: settings.paused,
+      paused: timeControls.paused,
       pointerLocked: isPointerLocked
     }
   });

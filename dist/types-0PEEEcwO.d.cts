@@ -49,13 +49,14 @@ interface OceanSettings {
     followCameraEveryFrame: boolean;
     farFadeStart: number;
     farFadeEnd: number;
-    simulationSpeed: number;
-    paused: boolean;
-    useServerTime: boolean;
-    serverTimeSec: number;
     wireframe: boolean;
     debugView: DebugViewMode;
 }
+type OceanWaveSettings = Pick<OceanSettings, "seaLevel" | "waveAmplitude" | "waveMean" | "dragMultiplier" | "baseFrequency" | "frequencyMultiplier" | "baseTimeMultiplier" | "timeMultiplierGrowth" | "weightDecay" | "waveDirectionSeed" | "phaseOffset" | "displacementOctaves" | "normalOctaves" | "normalEpsilon" | "highFrequencyFadeDistance" | "highFrequencyFadeStrength">;
+type OceanShadingSettings = Pick<OceanSettings, "fresnelBase" | "fresnelPower" | "reflectionStrength" | "scatterStrength" | "skyStrength" | "toneMapExposure" | "shallowColor" | "deepColor" | "foamEnabled" | "foamThreshold" | "foamIntensity" | "foamColor" | "skyHorizonColor" | "skyZenithColor" | "farFadeStart" | "farFadeEnd">;
+type OceanSunSettings = Pick<OceanSettings, "sunIntensity" | "sunGlowPower" | "sunGlowIntensity" | "sunElevationDeg" | "sunAzimuthDeg" | "animateSun" | "sunOrbitSpeed">;
+type OceanGeometrySettings = Pick<OceanSettings, "ringCount" | "baseRingWidth" | "ringWidthGrowth" | "centerRadialSegments" | "radialSegmentsDecay" | "minRadialSegments" | "angularSegments" | "detailFalloff" | "followSnap" | "followCameraEveryFrame">;
+type OceanDebugSettings = Pick<OceanSettings, "wireframe" | "debugView">;
 interface WaveSamplingParams {
     seaLevel: number;
     waveAmplitude: number;
@@ -79,4 +80,4 @@ interface RingSpec {
     detailScale: number;
 }
 
-export type { DebugViewMode as D, OceanSettings as O, RingSpec as R, WaveSamplingParams as W };
+export type { DebugViewMode as D, OceanSettings as O, RingSpec as R, WaveSamplingParams as W, OceanWaveSettings as a, OceanShadingSettings as b, OceanSunSettings as c, OceanGeometrySettings as d, OceanDebugSettings as e };

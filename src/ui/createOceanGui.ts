@@ -1,14 +1,38 @@
 import GUI from "lil-gui";
 import { cloneDefaultSettings, type OceanSettings } from "../ocean/types";
 
-interface OceanGuiOptions {
-  settings: OceanSettings;
-  onRebuildGeometry: () => void;
+export interface OceanTimeControls {
+  simulationSpeed: number;
+  paused: boolean;
+  useServerTime: boolean;
+  serverTimeSec: number;
 }
 
-export function createOceanGui({ settings, onRebuildGeometry }: OceanGuiOptions): GUI {
+interface OceanGuiOptions {
+  settings: OceanSettings;
+  timeControls: OceanTimeControls;
+  onRebuildGeometry: () => void;
+  onSettingsChanged?: () => void;
+}
+
+const DEFAULT_TIME_CONTROLS: OceanTimeControls = {
+  simulationSpeed: 1.0,
+  paused: false,
+  useServerTime: false,
+  serverTimeSec: 0.0
+};
+
+export function createOceanGui({
+  settings,
+  timeControls,
+  onRebuildGeometry,
+  onSettingsChanged
+}: OceanGuiOptions): GUI {
   const gui = new GUI({ title: "Ocean Controls", width: 380 });
   const controllers: Array<{ updateDisplay: () => void }> = [];
+  if (onSettingsChanged) {
+    gui.onChange(onSettingsChanged);
+  }
 
   const qualityPreset = { preset: "Reference+" };
   const applyQualityPreset = (preset: string): void => {
@@ -134,10 +158,10 @@ export function createOceanGui({ settings, onRebuildGeometry }: OceanGuiOptions)
 
   const timeFolder = gui.addFolder("Time");
   controllers.push(
-    timeFolder.add(settings, "simulationSpeed", 0.0, 4.0, 0.001),
-    timeFolder.add(settings, "paused"),
-    timeFolder.add(settings, "useServerTime"),
-    timeFolder.add(settings, "serverTimeSec", 0.0, 86400, 0.001)
+    timeFolder.add(timeControls, "simulationSpeed", 0.0, 4.0, 0.001),
+    timeFolder.add(timeControls, "paused"),
+    timeFolder.add(timeControls, "useServerTime"),
+    timeFolder.add(timeControls, "serverTimeSec", 0.0, 86400, 0.001)
   );
 
   const debugFolder = gui.addFolder("Debug");
@@ -150,6 +174,7 @@ export function createOceanGui({ settings, onRebuildGeometry }: OceanGuiOptions)
     rebuildLOD: () => onRebuildGeometry(),
     resetDefaults: () => {
       Object.assign(settings, cloneDefaultSettings());
+      Object.assign(timeControls, DEFAULT_TIME_CONTROLS);
       onRebuildGeometry();
       controllers.forEach((controller) => controller.updateDisplay());
     }

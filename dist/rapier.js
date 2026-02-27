@@ -9,7 +9,7 @@ var DEFAULT_CONFIG = {
   buoyancyScale: 1,
   linearDrag: 2.4,
   angularDrag: 1.2,
-  normalAlign: 0.35,
+  normalAlign: 0,
   normalSampleEpsilon: 0.2
 };
 function rotateVectorByQuaternion(x, y, z, qx, qy, qz, qw) {
@@ -27,6 +27,13 @@ function resolveConfig(config) {
     ...DEFAULT_CONFIG,
     ...config ?? {}
   };
+}
+function normalizeOrUp(x, y, z) {
+  const length = Math.hypot(x, y, z);
+  if (!Number.isFinite(length) || length <= 1e-8) {
+    return { x: 0, y: 1, z: 0 };
+  }
+  return { x: x / length, y: y / length, z: z / length };
 }
 function createBoxBuoyancyProbes(width, height, depth, subdivisions = 2) {
   const divisions = Math.max(1, Math.floor(subdivisions));
@@ -56,6 +63,7 @@ function applyBuoyancyToRigidBody(body, probes, waveParams, timeSec, dtSec, conf
     return { submergedProbeCount: 0, submergedFraction: 0 };
   }
   const cfg = resolveConfig(config);
+  const normalAlign = Math.max(0, Math.min(1, cfg.normalAlign));
   const translation = body.translation();
   const rotation = body.rotation();
   const weightedProbeCount = probes.reduce((sum, probe) => sum + Math.max(0, probe.weight ?? 1), 0) || 1;
@@ -100,25 +108,23 @@ function applyBuoyancyToRigidBody(body, probes, waveParams, timeSec, dtSec, conf
       waveParams,
       cfg.normalSampleEpsilon
     );
-    const forceDirX = nx * cfg.normalAlign;
-    const forceDirY = 1 - cfg.normalAlign + ny * cfg.normalAlign;
-    const forceDirZ = nz * cfg.normalAlign;
-    body.addForceAtPoint(
+    const buoyancyDir = normalizeOrUp(nx * normalAlign, 1 - normalAlign + ny * normalAlign, nz * normalAlign);
+    body.applyImpulseAtPoint(
       {
-        x: forceDirX * buoyancyMagnitude,
-        y: forceDirY * buoyancyMagnitude,
-        z: forceDirZ * buoyancyMagnitude
+        x: buoyancyDir.x * buoyancyMagnitude * dtSec,
+        y: buoyancyDir.y * buoyancyMagnitude * dtSec,
+        z: buoyancyDir.z * buoyancyMagnitude * dtSec
       },
       worldPoint,
       wakeUp
     );
     const pointVelocity = body.velocityAtPoint(worldPoint);
     const dragScale = cfg.linearDrag * submergence01;
-    body.addForceAtPoint(
+    body.applyImpulseAtPoint(
       {
-        x: -pointVelocity.x * dragScale,
-        y: -pointVelocity.y * dragScale,
-        z: -pointVelocity.z * dragScale
+        x: -pointVelocity.x * dragScale * dtSec,
+        y: -pointVelocity.y * dragScale * dtSec,
+        z: -pointVelocity.z * dragScale * dtSec
       },
       worldPoint,
       wakeUp
@@ -127,11 +133,11 @@ function applyBuoyancyToRigidBody(body, probes, waveParams, timeSec, dtSec, conf
   if (submergedProbeCount > 0) {
     const angVel = body.angvel();
     const angularDragScale = cfg.angularDrag * (submergedWeightTotal / weightedProbeCount);
-    body.addTorque(
+    body.applyTorqueImpulse(
       {
-        x: -angVel.x * angularDragScale,
-        y: -angVel.y * angularDragScale,
-        z: -angVel.z * angularDragScale
+        x: -angVel.x * angularDragScale * dtSec,
+        y: -angVel.y * angularDragScale * dtSec,
+        z: -angVel.z * angularDragScale * dtSec
       },
       wakeUp
     );

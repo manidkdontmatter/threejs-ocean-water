@@ -127,80 +127,18 @@ var SkyDome = class {
   }
 };
 
-// src/ocean/types.ts
-var DEFAULT_OCEAN_SETTINGS = {
-  seaLevel: 0,
-  waveAmplitude: 1.28,
-  waveMean: 0.56,
-  dragMultiplier: 0.28,
-  baseFrequency: 1,
-  frequencyMultiplier: 1.18,
-  baseTimeMultiplier: 2,
-  timeMultiplierGrowth: 1.07,
-  weightDecay: 0.82,
-  waveDirectionSeed: 0,
-  phaseOffset: 0,
-  displacementOctaves: 10,
-  normalOctaves: 24,
-  normalEpsilon: 0.08,
-  highFrequencyFadeDistance: 350,
-  highFrequencyFadeStrength: 0.92,
-  fresnelBase: 0.04,
-  fresnelPower: 5,
-  reflectionStrength: 1,
-  scatterStrength: 1,
-  skyStrength: 0.7,
-  toneMapExposure: 2.1,
-  shallowColor: "#3b8ac5",
-  deepColor: "#093a7a",
-  foamEnabled: true,
-  foamThreshold: 0.12,
-  foamIntensity: 0.55,
-  foamColor: "#dff7ff",
+// src/lib/OceanSky.ts
+var DEFAULT_OCEAN_SKY_OPTIONS = {
   skyHorizonColor: "#9dc7ea",
   skyZenithColor: "#2e5e96",
   sunIntensity: 1.2,
   sunGlowPower: 660,
   sunGlowIntensity: 210,
-  sunElevationDeg: 34,
-  sunAzimuthDeg: 20,
-  animateSun: false,
-  sunOrbitSpeed: 0.1,
-  ringCount: 6,
-  baseRingWidth: 42,
-  ringWidthGrowth: 1.66,
-  centerRadialSegments: 24,
-  radialSegmentsDecay: 0.8,
-  minRadialSegments: 4,
-  angularSegments: 256,
-  detailFalloff: 0.82,
-  followSnap: 1,
-  followCameraEveryFrame: false,
-  farFadeStart: 460,
-  farFadeEnd: 1050,
-  simulationSpeed: 1,
-  paused: false,
-  useServerTime: false,
-  serverTimeSec: 0,
-  wireframe: false,
-  debugView: "none"
+  skyStrength: 0.7,
+  toneMapExposure: 2.1
 };
-function cloneDefaultSettings() {
-  return { ...DEFAULT_OCEAN_SETTINGS };
-}
-
-// src/lib/OceanSky.ts
 function buildDefaultOceanSkyOptions() {
-  const defaults = cloneDefaultSettings();
-  return {
-    skyHorizonColor: defaults.skyHorizonColor,
-    skyZenithColor: defaults.skyZenithColor,
-    sunIntensity: defaults.sunIntensity,
-    sunGlowPower: defaults.sunGlowPower,
-    sunGlowIntensity: defaults.sunGlowIntensity,
-    skyStrength: defaults.skyStrength,
-    toneMapExposure: defaults.toneMapExposure
-  };
+  return { ...DEFAULT_OCEAN_SKY_OPTIONS };
 }
 var OceanSky = class {
   object3d;

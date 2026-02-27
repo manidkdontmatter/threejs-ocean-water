@@ -1,5 +1,6 @@
 export type DebugViewMode = "none" | "normals" | "height" | "fresnel" | "rings";
 
+// Render/behavior settings only. Simulation clock policy lives at the app layer.
 export interface OceanSettings {
   seaLevel: number;
   waveAmplitude: number;
@@ -50,13 +51,139 @@ export interface OceanSettings {
   followCameraEveryFrame: boolean;
   farFadeStart: number;
   farFadeEnd: number;
-  simulationSpeed: number;
-  paused: boolean;
-  useServerTime: boolean;
-  serverTimeSec: number;
   wireframe: boolean;
   debugView: DebugViewMode;
 }
+
+export type OceanWaveSettings = Pick<
+  OceanSettings,
+  | "seaLevel"
+  | "waveAmplitude"
+  | "waveMean"
+  | "dragMultiplier"
+  | "baseFrequency"
+  | "frequencyMultiplier"
+  | "baseTimeMultiplier"
+  | "timeMultiplierGrowth"
+  | "weightDecay"
+  | "waveDirectionSeed"
+  | "phaseOffset"
+  | "displacementOctaves"
+  | "normalOctaves"
+  | "normalEpsilon"
+  | "highFrequencyFadeDistance"
+  | "highFrequencyFadeStrength"
+>;
+
+export type OceanShadingSettings = Pick<
+  OceanSettings,
+  | "fresnelBase"
+  | "fresnelPower"
+  | "reflectionStrength"
+  | "scatterStrength"
+  | "skyStrength"
+  | "toneMapExposure"
+  | "shallowColor"
+  | "deepColor"
+  | "foamEnabled"
+  | "foamThreshold"
+  | "foamIntensity"
+  | "foamColor"
+  | "skyHorizonColor"
+  | "skyZenithColor"
+  | "farFadeStart"
+  | "farFadeEnd"
+>;
+
+export type OceanSunSettings = Pick<
+  OceanSettings,
+  | "sunIntensity"
+  | "sunGlowPower"
+  | "sunGlowIntensity"
+  | "sunElevationDeg"
+  | "sunAzimuthDeg"
+  | "animateSun"
+  | "sunOrbitSpeed"
+>;
+
+export type OceanGeometrySettings = Pick<
+  OceanSettings,
+  | "ringCount"
+  | "baseRingWidth"
+  | "ringWidthGrowth"
+  | "centerRadialSegments"
+  | "radialSegmentsDecay"
+  | "minRadialSegments"
+  | "angularSegments"
+  | "detailFalloff"
+  | "followSnap"
+  | "followCameraEveryFrame"
+>;
+
+export type OceanDebugSettings = Pick<OceanSettings, "wireframe" | "debugView">;
+
+export const OCEAN_WAVE_KEYS = [
+  "seaLevel",
+  "waveAmplitude",
+  "waveMean",
+  "dragMultiplier",
+  "baseFrequency",
+  "frequencyMultiplier",
+  "baseTimeMultiplier",
+  "timeMultiplierGrowth",
+  "weightDecay",
+  "waveDirectionSeed",
+  "phaseOffset",
+  "displacementOctaves",
+  "normalOctaves",
+  "normalEpsilon",
+  "highFrequencyFadeDistance",
+  "highFrequencyFadeStrength"
+] as const satisfies ReadonlyArray<keyof OceanSettings>;
+
+export const OCEAN_SHADING_KEYS = [
+  "fresnelBase",
+  "fresnelPower",
+  "reflectionStrength",
+  "scatterStrength",
+  "skyStrength",
+  "toneMapExposure",
+  "shallowColor",
+  "deepColor",
+  "foamEnabled",
+  "foamThreshold",
+  "foamIntensity",
+  "foamColor",
+  "skyHorizonColor",
+  "skyZenithColor",
+  "farFadeStart",
+  "farFadeEnd"
+] as const satisfies ReadonlyArray<keyof OceanSettings>;
+
+export const OCEAN_SUN_KEYS = [
+  "sunIntensity",
+  "sunGlowPower",
+  "sunGlowIntensity",
+  "sunElevationDeg",
+  "sunAzimuthDeg",
+  "animateSun",
+  "sunOrbitSpeed"
+] as const satisfies ReadonlyArray<keyof OceanSettings>;
+
+export const OCEAN_GEOMETRY_KEYS = [
+  "ringCount",
+  "baseRingWidth",
+  "ringWidthGrowth",
+  "centerRadialSegments",
+  "radialSegmentsDecay",
+  "minRadialSegments",
+  "angularSegments",
+  "detailFalloff"
+] as const satisfies ReadonlyArray<keyof OceanSettings>;
+
+export const OCEAN_DEBUG_KEYS = ["wireframe", "debugView"] as const satisfies ReadonlyArray<
+  keyof OceanSettings
+>;
 
 export interface WaveSamplingParams {
   seaLevel: number;
@@ -132,10 +259,6 @@ export const DEFAULT_OCEAN_SETTINGS: OceanSettings = {
   followCameraEveryFrame: false,
   farFadeStart: 460.0,
   farFadeEnd: 1050.0,
-  simulationSpeed: 1.0,
-  paused: false,
-  useServerTime: false,
-  serverTimeSec: 0.0,
   wireframe: false,
   debugView: "none"
 };

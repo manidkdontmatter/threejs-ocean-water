@@ -1,5 +1,3 @@
-import { toWaveSamplingParams, cloneDefaultSettings } from './chunk-FW24ATZP.js';
-export { OceanSky, createDefaultOceanSkyOptions, createOceanSky } from './chunk-FW24ATZP.js';
 import { sampleWaveHeight } from './chunk-IT73NM3N.js';
 import { Vector3, Group, Color, Mesh, MathUtils, BufferGeometry, LineBasicMaterial, LineLoop, BufferAttribute, ShaderMaterial } from 'three';
 
@@ -460,6 +458,90 @@ function createOceanMaterial(ringDetailScale) {
   });
 }
 
+// src/ocean/types.ts
+var OCEAN_GEOMETRY_KEYS = [
+  "ringCount",
+  "baseRingWidth",
+  "ringWidthGrowth",
+  "centerRadialSegments",
+  "radialSegmentsDecay",
+  "minRadialSegments",
+  "angularSegments",
+  "detailFalloff"
+];
+var DEFAULT_OCEAN_SETTINGS = {
+  seaLevel: 0,
+  waveAmplitude: 1.28,
+  waveMean: 0.56,
+  dragMultiplier: 0.28,
+  baseFrequency: 1,
+  frequencyMultiplier: 1.18,
+  baseTimeMultiplier: 2,
+  timeMultiplierGrowth: 1.07,
+  weightDecay: 0.82,
+  waveDirectionSeed: 0,
+  phaseOffset: 0,
+  displacementOctaves: 10,
+  normalOctaves: 24,
+  normalEpsilon: 0.08,
+  highFrequencyFadeDistance: 350,
+  highFrequencyFadeStrength: 0.92,
+  fresnelBase: 0.04,
+  fresnelPower: 5,
+  reflectionStrength: 1,
+  scatterStrength: 1,
+  skyStrength: 0.7,
+  toneMapExposure: 2.1,
+  shallowColor: "#3b8ac5",
+  deepColor: "#093a7a",
+  foamEnabled: true,
+  foamThreshold: 0.12,
+  foamIntensity: 0.55,
+  foamColor: "#dff7ff",
+  skyHorizonColor: "#9dc7ea",
+  skyZenithColor: "#2e5e96",
+  sunIntensity: 1.2,
+  sunGlowPower: 660,
+  sunGlowIntensity: 210,
+  sunElevationDeg: 34,
+  sunAzimuthDeg: 20,
+  animateSun: false,
+  sunOrbitSpeed: 0.1,
+  ringCount: 6,
+  baseRingWidth: 42,
+  ringWidthGrowth: 1.66,
+  centerRadialSegments: 24,
+  radialSegmentsDecay: 0.8,
+  minRadialSegments: 4,
+  angularSegments: 256,
+  detailFalloff: 0.82,
+  followSnap: 1,
+  followCameraEveryFrame: false,
+  farFadeStart: 460,
+  farFadeEnd: 1050,
+  wireframe: false,
+  debugView: "none"
+};
+function toWaveSamplingParams(settings) {
+  return {
+    seaLevel: settings.seaLevel,
+    waveAmplitude: settings.waveAmplitude,
+    waveMean: settings.waveMean,
+    dragMultiplier: settings.dragMultiplier,
+    baseFrequency: settings.baseFrequency,
+    frequencyMultiplier: settings.frequencyMultiplier,
+    baseTimeMultiplier: settings.baseTimeMultiplier,
+    timeMultiplierGrowth: settings.timeMultiplierGrowth,
+    weightDecay: settings.weightDecay,
+    waveDirectionSeed: settings.waveDirectionSeed,
+    phaseOffset: settings.phaseOffset,
+    displacementOctaves: settings.displacementOctaves
+  };
+}
+function cloneDefaultSettings() {
+  return { ...DEFAULT_OCEAN_SETTINGS };
+}
+
 // src/ocean/OceanSystem.ts
 var OceanSystem = class {
   constructor(settings) {
@@ -648,16 +730,7 @@ var OceanSystem = class {
 };
 
 // src/lib/Ocean.ts
-var GEOMETRY_OPTION_KEYS = /* @__PURE__ */ new Set([
-  "ringCount",
-  "baseRingWidth",
-  "ringWidthGrowth",
-  "centerRadialSegments",
-  "radialSegmentsDecay",
-  "minRadialSegments",
-  "angularSegments",
-  "detailFalloff"
-]);
+var GEOMETRY_OPTION_KEYS = new Set(OCEAN_GEOMETRY_KEYS);
 function mergeWithDefaults(options) {
   return {
     ...cloneDefaultSettings(),
@@ -673,56 +746,47 @@ var Ocean = class {
     this.settings = mergeWithDefaults(options);
     this.system = new OceanSystem(this.settings);
     this.object3d = this.system.group;
-    this.timeSec = this.settings.useServerTime ? this.settings.serverTimeSec : 0;
     this.system.setTime(this.timeSec);
   }
   getOptions() {
     return { ...this.settings };
   }
   setOptions(options) {
-    let rebuildGeometry = false;
-    for (const key of Object.keys(options)) {
-      const nextValue = options[key];
-      if (typeof nextValue === "undefined") {
-        continue;
-      }
-      if (this.settings[key] === nextValue) {
-        continue;
-      }
-      this.settings[key] = nextValue;
-      if (GEOMETRY_OPTION_KEYS.has(key)) {
-        rebuildGeometry = true;
-      }
-    }
-    if (rebuildGeometry) {
-      this.system.rebuildGeometry();
-    }
+    this.applyOptions(options);
+  }
+  setWaveOptions(options) {
+    this.applyOptions(options);
+  }
+  setShadingOptions(options) {
+    this.applyOptions(options);
+  }
+  setSunOptions(options) {
+    this.applyOptions(options);
+  }
+  setGeometryOptions(options) {
+    this.applyOptions(options);
+  }
+  setDebugOptions(options) {
+    this.applyOptions(options);
   }
   update({ camera, deltaTimeSec, timeSec }) {
     if (typeof timeSec === "number" && Number.isFinite(timeSec)) {
       this.timeSec = timeSec;
-      if (this.settings.useServerTime) {
-        this.settings.serverTimeSec = timeSec;
-      }
     } else if (typeof deltaTimeSec === "number" && Number.isFinite(deltaTimeSec)) {
-      if (!this.settings.paused) {
-        const scaledDelta = deltaTimeSec * this.settings.simulationSpeed;
-        if (this.settings.useServerTime) {
-          this.settings.serverTimeSec += scaledDelta;
-          this.timeSec = this.settings.serverTimeSec;
-        } else {
-          this.timeSec += scaledDelta;
-        }
-      }
+      this.timeSec += deltaTimeSec;
     }
     this.system.setTime(this.timeSec);
     this.system.update(camera);
   }
+  advanceTime(deltaTimeSec) {
+    if (Number.isFinite(deltaTimeSec)) {
+      this.timeSec += deltaTimeSec;
+      this.system.setTime(this.timeSec);
+    }
+    return this.timeSec;
+  }
   setTime(timeSec) {
     this.timeSec = timeSec;
-    if (this.settings.useServerTime) {
-      this.settings.serverTimeSec = timeSec;
-    }
     this.system.setTime(timeSec);
   }
   getTime() {
@@ -748,6 +812,25 @@ var Ocean = class {
   }
   dispose() {
     this.system.dispose();
+  }
+  applyOptions(options) {
+    let rebuildGeometry = false;
+    for (const key of Object.keys(options)) {
+      const nextValue = options[key];
+      if (typeof nextValue === "undefined") {
+        continue;
+      }
+      if (this.settings[key] === nextValue) {
+        continue;
+      }
+      this.settings[key] = nextValue;
+      if (GEOMETRY_OPTION_KEYS.has(key)) {
+        rebuildGeometry = true;
+      }
+    }
+    if (rebuildGeometry) {
+      this.system.rebuildGeometry();
+    }
   }
 };
 function createOcean(options) {

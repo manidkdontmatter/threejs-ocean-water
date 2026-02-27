@@ -3,8 +3,14 @@ import { Vector3 } from "three";
 import { OceanSystem } from "../ocean/OceanSystem";
 import {
   cloneDefaultSettings,
+  OCEAN_GEOMETRY_KEYS,
   toWaveSamplingParams,
+  type OceanDebugSettings,
+  type OceanGeometrySettings,
   type OceanSettings,
+  type OceanShadingSettings,
+  type OceanSunSettings,
+  type OceanWaveSettings,
   type WaveSamplingParams
 } from "../ocean/types";
 import { sampleWaveHeight } from "../ocean/waveMath";
@@ -13,20 +19,11 @@ export type OceanOptions = Partial<OceanSettings>;
 
 export interface OceanUpdateParams {
   camera: Camera;
-  deltaTimeSec?: number;
   timeSec?: number;
+  deltaTimeSec?: number;
 }
 
-const GEOMETRY_OPTION_KEYS = new Set<keyof OceanSettings>([
-  "ringCount",
-  "baseRingWidth",
-  "ringWidthGrowth",
-  "centerRadialSegments",
-  "radialSegmentsDecay",
-  "minRadialSegments",
-  "angularSegments",
-  "detailFalloff"
-]);
+const GEOMETRY_OPTION_KEYS = new Set<keyof OceanSettings>(OCEAN_GEOMETRY_KEYS);
 
 function mergeWithDefaults(options?: OceanOptions): OceanSettings {
   return {
@@ -45,7 +42,6 @@ export class Ocean {
     this.settings = mergeWithDefaults(options);
     this.system = new OceanSystem(this.settings);
     this.object3d = this.system.group;
-    this.timeSec = this.settings.useServerTime ? this.settings.serverTimeSec : 0.0;
     this.system.setTime(this.timeSec);
   }
 
@@ -54,53 +50,50 @@ export class Ocean {
   }
 
   setOptions(options: OceanOptions): void {
-    let rebuildGeometry = false;
-    for (const key of Object.keys(options) as Array<keyof OceanSettings>) {
-      const nextValue = options[key];
-      if (typeof nextValue === "undefined") {
-        continue;
-      }
-      if (this.settings[key] === nextValue) {
-        continue;
-      }
-      this.settings[key] = nextValue as never;
-      if (GEOMETRY_OPTION_KEYS.has(key)) {
-        rebuildGeometry = true;
-      }
-    }
+    this.applyOptions(options);
+  }
 
-    if (rebuildGeometry) {
-      this.system.rebuildGeometry();
-    }
+  setWaveOptions(options: Partial<OceanWaveSettings>): void {
+    this.applyOptions(options);
+  }
+
+  setShadingOptions(options: Partial<OceanShadingSettings>): void {
+    this.applyOptions(options);
+  }
+
+  setSunOptions(options: Partial<OceanSunSettings>): void {
+    this.applyOptions(options);
+  }
+
+  setGeometryOptions(options: Partial<OceanGeometrySettings>): void {
+    this.applyOptions(options);
+  }
+
+  setDebugOptions(options: Partial<OceanDebugSettings>): void {
+    this.applyOptions(options);
   }
 
   update({ camera, deltaTimeSec, timeSec }: OceanUpdateParams): void {
     if (typeof timeSec === "number" && Number.isFinite(timeSec)) {
       this.timeSec = timeSec;
-      if (this.settings.useServerTime) {
-        this.settings.serverTimeSec = timeSec;
-      }
     } else if (typeof deltaTimeSec === "number" && Number.isFinite(deltaTimeSec)) {
-      if (!this.settings.paused) {
-        const scaledDelta = deltaTimeSec * this.settings.simulationSpeed;
-        if (this.settings.useServerTime) {
-          this.settings.serverTimeSec += scaledDelta;
-          this.timeSec = this.settings.serverTimeSec;
-        } else {
-          this.timeSec += scaledDelta;
-        }
-      }
+      this.timeSec += deltaTimeSec;
     }
 
     this.system.setTime(this.timeSec);
     this.system.update(camera);
   }
 
+  advanceTime(deltaTimeSec: number): number {
+    if (Number.isFinite(deltaTimeSec)) {
+      this.timeSec += deltaTimeSec;
+      this.system.setTime(this.timeSec);
+    }
+    return this.timeSec;
+  }
+
   setTime(timeSec: number): void {
     this.timeSec = timeSec;
-    if (this.settings.useServerTime) {
-      this.settings.serverTimeSec = timeSec;
-    }
     this.system.setTime(timeSec);
   }
 
@@ -134,6 +127,27 @@ export class Ocean {
 
   dispose(): void {
     this.system.dispose();
+  }
+
+  private applyOptions(options: OceanOptions): void {
+    let rebuildGeometry = false;
+    for (const key of Object.keys(options) as Array<keyof OceanSettings>) {
+      const nextValue = options[key];
+      if (typeof nextValue === "undefined") {
+        continue;
+      }
+      if (this.settings[key] === nextValue) {
+        continue;
+      }
+      this.settings[key] = nextValue as never;
+      if (GEOMETRY_OPTION_KEYS.has(key)) {
+        rebuildGeometry = true;
+      }
+    }
+
+    if (rebuildGeometry) {
+      this.system.rebuildGeometry();
+    }
   }
 }
 

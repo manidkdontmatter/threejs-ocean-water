@@ -1,20 +1,20 @@
 import type { Camera, Vector3 } from "three";
 import { SkyDome, type SkyDomeSettings } from "../ocean/SkyDome";
-import { cloneDefaultSettings } from "../ocean/types";
 
 export type OceanSkyOptions = SkyDomeSettings;
 
+const DEFAULT_OCEAN_SKY_OPTIONS: OceanSkyOptions = {
+  skyHorizonColor: "#9dc7ea",
+  skyZenithColor: "#2e5e96",
+  sunIntensity: 1.2,
+  sunGlowPower: 660.0,
+  sunGlowIntensity: 210.0,
+  skyStrength: 0.7,
+  toneMapExposure: 2.1
+};
+
 function buildDefaultOceanSkyOptions(): OceanSkyOptions {
-  const defaults = cloneDefaultSettings();
-  return {
-    skyHorizonColor: defaults.skyHorizonColor,
-    skyZenithColor: defaults.skyZenithColor,
-    sunIntensity: defaults.sunIntensity,
-    sunGlowPower: defaults.sunGlowPower,
-    sunGlowIntensity: defaults.sunGlowIntensity,
-    skyStrength: defaults.skyStrength,
-    toneMapExposure: defaults.toneMapExposure
-  };
+  return { ...DEFAULT_OCEAN_SKY_OPTIONS };
 }
 
 export class OceanSky {

@@ -4,7 +4,7 @@ Reusable Three.js ocean system with:
 
 - GPU-rendered ocean mesh (clipmap-style concentric rings)
 - Deterministic wave sampling for server buoyancy
-- Optional sky dome module
+- Optional sky dome module (separate subpath)
 
 ## Install
 
@@ -32,14 +32,18 @@ const ocean = new Ocean({
 scene.add(ocean.object3d);
 
 const clock = new THREE.Clock();
+let elapsedSec = 0;
 function frame() {
   const dt = clock.getDelta();
-  ocean.update({ camera, deltaTimeSec: dt });
+  elapsedSec += dt;
+  ocean.update({ camera, timeSec: elapsedSec });
   renderer.render(scene, camera);
   requestAnimationFrame(frame);
 }
 frame();
 ```
+
+`Ocean` no longer owns pause/sim-speed/server-time policy. Keep that in your game loop and pass absolute `timeSec` (recommended), or use `deltaTimeSec` as a convenience.
 
 ## Optional Sky
 
@@ -81,9 +85,6 @@ const y = sampleWaveHeight(x, z, serverTimeSec, {
   - `Ocean`
   - `createOcean`
   - `createDefaultOceanOptions`
-  - `OceanSky`
-  - `createOceanSky`
-  - `createDefaultOceanSkyOptions`
 - `web-ocean-water/math`
   - `sampleWaveHeight`
   - `sampleWaveValue`
