@@ -1,5 +1,5 @@
 import GUI from "lil-gui";
-import { cloneDefaultSettings, type OceanSettings } from "../ocean/types";
+import { createDefaultOceanOptions, type OceanSettings } from "web-ocean-water";
 
 export interface OceanTimeControls {
   simulationSpeed: number;
@@ -177,7 +177,7 @@ export function createOceanGui({
   const actions = {
     rebuildLOD: () => onRebuildGeometry(),
     resetDefaults: () => {
-      Object.assign(settings, cloneDefaultSettings());
+      Object.assign(settings, createDefaultOceanOptions());
       Object.assign(timeControls, DEFAULT_TIME_CONTROLS);
       onRebuildGeometry();
       controllers.forEach((controller) => controller.updateDisplay());

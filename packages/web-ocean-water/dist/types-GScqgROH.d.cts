@@ -71,13 +71,5 @@ interface WaveSamplingParams {
     phaseOffset: number;
     displacementOctaves: number;
 }
-interface RingSpec {
-    index: number;
-    innerRadius: number;
-    outerRadius: number;
-    radialSegments: number;
-    angularSegments: number;
-    detailScale: number;
-}
 
-export type { DebugViewMode as D, OceanSettings as O, RingSpec as R, WaveSamplingParams as W, OceanWaveSettings as a, OceanShadingSettings as b, OceanSunSettings as c, OceanGeometrySettings as d, OceanDebugSettings as e };
+export type { DebugViewMode as D, OceanWaveSettings as O, WaveSamplingParams as W, OceanShadingSettings as a, OceanSunSettings as b, OceanGeometrySettings as c, OceanDebugSettings as d, OceanSettings as e };

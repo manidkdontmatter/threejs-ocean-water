@@ -1,0 +1,65 @@
+{
+  "name": "web-ocean-water",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./math": {
+      "types": "./dist/math.d.ts",
+      "import": "./dist/math.js",
+      "require": "./dist/math.cjs"
+    },
+    "./sky": {
+      "types": "./dist/sky.d.ts",
+      "import": "./dist/sky.js",
+      "require": "./dist/sky.cjs"
+    },
+    "./rapier": {
+      "types": "./dist/rapier.d.ts",
+      "import": "./dist/rapier.js",
+      "require": "./dist/rapier.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "three",
+    "threejs",
+    "ocean",
+    "water",
+    "shader",
+    "buoyancy"
+  ],
+  "author": "",
+  "license": "ISC",
+  "description": "Reusable Three.js ocean/water system with deterministic wave sampling and optional sky dome.",
+  "peerDependencies": {
+    "@dimforge/rapier3d-compat": "^0.19.3",
+    "three": "^0.183.1"
+  },
+  "peerDependenciesMeta": {
+    "@dimforge/rapier3d-compat": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.1",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "web-ocean-water-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build --outDir demo-dist",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test:follow-snap": "node scripts/test-follow-snap.mjs"
+  },
+  "dependencies": {
+    "@dimforge/rapier3d-compat": "^0.19.3",
+    "lil-gui": "^0.21.0",
+    "three": "^0.183.1",
+    "web-ocean-water": "file:../../packages/web-ocean-water"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.1",
+    "@types/three": "^0.183.1",
+    "playwright": "^1.58.2",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1"
+  }
+}

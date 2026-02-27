@@ -1,4 +1,4 @@
-import { W as WaveSamplingParams } from './types-0PEEEcwO.cjs';
+import { W as WaveSamplingParams } from './types-GScqgROH.js';
 
 declare function sampleWaveValue(x: number, z: number, timeSec: number, params: WaveSamplingParams, octaves?: number): number;
 /**

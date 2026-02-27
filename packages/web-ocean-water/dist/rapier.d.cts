@@ -1,5 +1,5 @@
 import { RigidBody } from '@dimforge/rapier3d-compat';
-import { W as WaveSamplingParams } from './types-0PEEEcwO.js';
+import { W as WaveSamplingParams } from './types-GScqgROH.cjs';
 
 interface BuoyancyProbe {
     x: number;

@@ -1,6 +1,6 @@
 node_modules/
 output/
-demo-dist/
+apps/demo/demo-dist/
 
 # local logs
 *.log

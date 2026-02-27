@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "types": ["vite/client"],
+    "baseUrl": ".",
+    "paths": {
+      "web-ocean-water": ["../../packages/web-ocean-water/src/lib/index.ts"],
+      "web-ocean-water/math": ["../../packages/web-ocean-water/src/lib/math.ts"],
+      "web-ocean-water/sky": ["../../packages/web-ocean-water/src/lib/sky.ts"],
+      "web-ocean-water/rapier": ["../../packages/web-ocean-water/src/lib/rapier.ts"]
+    }
+  },
+  "include": ["src", "scripts"]
+}

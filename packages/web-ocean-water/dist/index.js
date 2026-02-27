@@ -459,7 +459,64 @@ function createOceanMaterial(ringDetailScale) {
 }
 
 // src/ocean/types.ts
+var OCEAN_WAVE_KEYS = [
+  "seaLevel",
+  "waveAmplitude",
+  "waveMean",
+  "dragMultiplier",
+  "baseFrequency",
+  "frequencyMultiplier",
+  "baseTimeMultiplier",
+  "timeMultiplierGrowth",
+  "weightDecay",
+  "waveDirectionSeed",
+  "phaseOffset",
+  "displacementOctaves",
+  "normalOctaves",
+  "normalEpsilon",
+  "highFrequencyFadeDistance",
+  "highFrequencyFadeStrength"
+];
+var OCEAN_SHADING_KEYS = [
+  "fresnelBase",
+  "fresnelPower",
+  "reflectionStrength",
+  "scatterStrength",
+  "skyStrength",
+  "toneMapExposure",
+  "shallowColor",
+  "deepColor",
+  "foamEnabled",
+  "foamThreshold",
+  "foamIntensity",
+  "foamColor",
+  "skyHorizonColor",
+  "skyZenithColor",
+  "farFadeStart",
+  "farFadeEnd"
+];
+var OCEAN_SUN_KEYS = [
+  "sunIntensity",
+  "sunGlowPower",
+  "sunGlowIntensity",
+  "sunElevationDeg",
+  "sunAzimuthDeg",
+  "animateSun",
+  "sunOrbitSpeed"
+];
 var OCEAN_GEOMETRY_KEYS = [
+  "ringCount",
+  "baseRingWidth",
+  "ringWidthGrowth",
+  "centerRadialSegments",
+  "radialSegmentsDecay",
+  "minRadialSegments",
+  "angularSegments",
+  "detailFalloff",
+  "followSnap",
+  "followCameraEveryFrame"
+];
+var OCEAN_GEOMETRY_REBUILD_KEYS = [
   "ringCount",
   "baseRingWidth",
   "ringWidthGrowth",
@@ -469,6 +526,7 @@ var OCEAN_GEOMETRY_KEYS = [
   "angularSegments",
   "detailFalloff"
 ];
+var OCEAN_DEBUG_KEYS = ["wireframe", "debugView"];
 var DEFAULT_OCEAN_SETTINGS = {
   seaLevel: 0,
   waveAmplitude: 1.28,
@@ -729,11 +787,63 @@ var OceanSystem = class {
   }
 };
 
+// src/lib/settings.ts
+function pickSettings(settings, keys) {
+  const picked = {};
+  for (const key of keys) {
+    picked[key] = settings[key];
+  }
+  return picked;
+}
+function createDefaultOceanOptions() {
+  return cloneDefaultSettings();
+}
+function createDefaultOceanWaveOptions() {
+  return pickSettings(cloneDefaultSettings(), OCEAN_WAVE_KEYS);
+}
+function createDefaultOceanShadingOptions() {
+  return pickSettings(cloneDefaultSettings(), OCEAN_SHADING_KEYS);
+}
+function createDefaultOceanSunOptions() {
+  return pickSettings(cloneDefaultSettings(), OCEAN_SUN_KEYS);
+}
+function createDefaultOceanGeometryOptions() {
+  return pickSettings(cloneDefaultSettings(), OCEAN_GEOMETRY_KEYS);
+}
+function createDefaultOceanDebugOptions() {
+  return pickSettings(cloneDefaultSettings(), OCEAN_DEBUG_KEYS);
+}
+function createDefaultOceanConfig() {
+  const defaults = cloneDefaultSettings();
+  return getOceanConfigSnapshot(defaults);
+}
+function getOceanConfigSnapshot(settings) {
+  return {
+    wave: pickSettings(settings, OCEAN_WAVE_KEYS),
+    shading: pickSettings(settings, OCEAN_SHADING_KEYS),
+    sun: pickSettings(settings, OCEAN_SUN_KEYS),
+    geometry: pickSettings(settings, OCEAN_GEOMETRY_KEYS),
+    debug: pickSettings(settings, OCEAN_DEBUG_KEYS)
+  };
+}
+function flattenOceanConfig(config) {
+  return {
+    ...config.wave ?? {},
+    ...config.shading ?? {},
+    ...config.sun ?? {},
+    ...config.geometry ?? {},
+    ...config.debug ?? {}
+  };
+}
+function toOceanWaveSamplingParams(settings) {
+  return toWaveSamplingParams(settings);
+}
+
 // src/lib/Ocean.ts
-var GEOMETRY_OPTION_KEYS = new Set(OCEAN_GEOMETRY_KEYS);
+var GEOMETRY_REBUILD_KEYS = new Set(OCEAN_GEOMETRY_REBUILD_KEYS);
 function mergeWithDefaults(options) {
   return {
-    ...cloneDefaultSettings(),
+    ...createDefaultOceanOptions(),
     ...options ?? {}
   };
 }
@@ -751,8 +861,29 @@ var Ocean = class {
   getOptions() {
     return { ...this.settings };
   }
+  getConfig() {
+    return getOceanConfigSnapshot(this.settings);
+  }
+  getWaveOptions() {
+    return this.getConfig().wave;
+  }
+  getShadingOptions() {
+    return this.getConfig().shading;
+  }
+  getSunOptions() {
+    return this.getConfig().sun;
+  }
+  getGeometryOptions() {
+    return this.getConfig().geometry;
+  }
+  getDebugOptions() {
+    return this.getConfig().debug;
+  }
   setOptions(options) {
     this.applyOptions(options);
+  }
+  setConfig(config) {
+    this.applyOptions(flattenOceanConfig(config));
   }
   setWaveOptions(options) {
     this.applyOptions(options);
@@ -805,7 +936,7 @@ var Ocean = class {
     return this.system.getMaxOceanRadius();
   }
   getWaveSamplingParams() {
-    return toWaveSamplingParams(this.settings);
+    return toOceanWaveSamplingParams(this.settings);
   }
   sampleHeightHeadless(x, z, timeSec) {
     return sampleWaveHeight(x, z, timeSec, this.getWaveSamplingParams());
@@ -824,7 +955,7 @@ var Ocean = class {
         continue;
       }
       this.settings[key] = nextValue;
-      if (GEOMETRY_OPTION_KEYS.has(key)) {
+      if (GEOMETRY_REBUILD_KEYS.has(key)) {
         rebuildGeometry = true;
       }
     }
@@ -836,10 +967,10 @@ var Ocean = class {
 function createOcean(options) {
   return new Ocean(options);
 }
-function createDefaultOceanOptions() {
-  return cloneDefaultSettings();
+function createDefaultOceanOptions2() {
+  return createDefaultOceanOptions();
 }
 
-export { Ocean, createDefaultOceanOptions, createOcean };
+export { Ocean, createDefaultOceanConfig, createDefaultOceanDebugOptions, createDefaultOceanGeometryOptions, createDefaultOceanOptions2 as createDefaultOceanOptions, createDefaultOceanShadingOptions, createDefaultOceanSunOptions, createDefaultOceanWaveOptions, createOcean, getOceanConfigSnapshot };
 //# sourceMappingURL=index.js.map
 //# sourceMappingURL=index.js.map

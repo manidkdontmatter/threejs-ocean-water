@@ -18,9 +18,9 @@ import {
   Vector3,
   WebGLRenderer
 } from "three";
-import { Ocean, createDefaultOceanOptions, type OceanSettings } from "./lib";
-import { OceanSky } from "./lib/sky";
-import { applyBuoyancyToRigidBody, createBoxBuoyancyProbes } from "./lib/rapier";
+import { Ocean, createDefaultOceanOptions, type OceanSettings } from "web-ocean-water";
+import { OceanSky } from "web-ocean-water/sky";
+import { applyBuoyancyToRigidBody, createBoxBuoyancyProbes } from "web-ocean-water/rapier";
 import { createOceanGui, type OceanTimeControls } from "./ui/createOceanGui";
 
 declare global {
