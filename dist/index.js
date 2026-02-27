@@ -1,6 +1,6 @@
-import { sampleWaveHeight } from './chunk-IT73NM3N.js';
 import { toWaveSamplingParams, cloneDefaultSettings } from './chunk-FW24ATZP.js';
 export { OceanSky, createDefaultOceanSkyOptions, createOceanSky } from './chunk-FW24ATZP.js';
+import { sampleWaveHeight } from './chunk-IT73NM3N.js';
 import { Vector3, Group, Color, Mesh, MathUtils, BufferGeometry, LineBasicMaterial, LineLoop, BufferAttribute, ShaderMaterial } from 'three';
 
 function buildRingSpecs(settings) {

@@ -88,10 +88,29 @@ const y = sampleWaveHeight(x, z, serverTimeSec, {
   - `sampleWaveHeight`
   - `sampleWaveValue`
   - `sampleWaveNormal`
+- `web-ocean-water/rapier` (optional)
+  - `createBoxBuoyancyProbes`
+  - `applyBuoyancyToRigidBody`
 - `web-ocean-water/sky`
   - `OceanSky`
   - `createOceanSky`
   - `createDefaultOceanSkyOptions`
+
+## Optional Rapier Buoyancy Adapter
+
+```ts
+import { applyBuoyancyToRigidBody, createBoxBuoyancyProbes } from "web-ocean-water/rapier";
+
+const probes = createBoxBuoyancyProbes(2, 2, 2, 2);
+
+// In your own fixed-step loop, before world.step():
+applyBuoyancyToRigidBody(rigidBody, probes, oceanWaveParams, simTimeSec, fixedDtSec, {
+  volume: 8.0,
+  fluidDensity: 1.0
+});
+```
+
+The adapter does not create or step a Rapier world; it only applies forces to bodies you own.
 
 ## Local Development
 

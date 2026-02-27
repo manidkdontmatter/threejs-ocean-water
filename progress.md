@@ -91,3 +91,14 @@ Original prompt: in this workspace there is a file containing some kind of shade
 - Manually tune UI defaults further by visual comparison to the original reference shader if stricter visual parity is needed.
 - Optional perf pass: split shader code paths for near/far rings to reduce fragment cost at very high quality settings.
 - Optional multiplayer prep: add a tiny exported `OceanSharedParams` serialization helper for clean server/client param sync payloads.
+
+- Added Rapier physics dependency for floating-body simulation: @dimforge/rapier3d-compat.
+- Re-verified 
+pm run typecheck passes after Rapier install.
+
+- Added optional Rapier adapter entrypoint: web-ocean-water/rapier with pplyBuoyancyToRigidBody and createBoxBuoyancyProbes (no internal world ownership).
+- Updated packaging: added ./rapier export, added Rapier as optional peer, and externalized Rapier in tsup build.
+- Integrated demo floating physics with Rapier: three bodies (cube, tall/narrow, wide/short), buoyancy probes, water drag, angular drag, and a dedicated Floating Bodies GUI section.
+- Re-verified 
+pm run typecheck and 
+pm run build after buoyancy integration.

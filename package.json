@@ -21,6 +21,11 @@
       "import": "./dist/sky.js",
       "require": "./dist/sky.cjs"
     },
+    "./rapier": {
+      "types": "./dist/rapier.d.ts",
+      "import": "./dist/rapier.js",
+      "require": "./dist/rapier.cjs"
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -49,9 +54,16 @@
   "license": "ISC",
   "description": "Reusable Three.js ocean/water system with deterministic wave sampling and optional sky dome.",
   "peerDependencies": {
+    "@dimforge/rapier3d-compat": "^0.19.3",
     "three": "^0.183.1"
   },
+  "peerDependenciesMeta": {
+    "@dimforge/rapier3d-compat": {
+      "optional": true
+    }
+  },
   "devDependencies": {
+    "@dimforge/rapier3d-compat": "^0.19.3",
     "@types/node": "^25.3.1",
     "@types/three": "^0.183.1",
     "lil-gui": "^0.21.0",
