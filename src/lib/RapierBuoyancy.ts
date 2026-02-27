@@ -1,6 +1,6 @@
 import type { RigidBody } from "@dimforge/rapier3d-compat";
 import { sampleWaveHeight, sampleWaveNormal } from "../ocean/waveMath";
-import type { WaveSamplingParams } from "../ocean/types";
+import type { WaveSamplingParams } from "./settings";
 
 export interface BuoyancyProbe {
   x: number;

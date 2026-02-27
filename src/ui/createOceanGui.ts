@@ -30,9 +30,9 @@ export function createOceanGui({
 }: OceanGuiOptions): GUI {
   const gui = new GUI({ title: "Ocean Controls", width: 380 });
   const controllers: Array<{ updateDisplay: () => void }> = [];
-  if (onSettingsChanged) {
-    gui.onChange(onSettingsChanged);
-  }
+  const runtimeChanged = (): void => {
+    onSettingsChanged?.();
+  };
 
   const qualityPreset = { preset: "Reference+" };
   const applyQualityPreset = (preset: string): void => {
@@ -78,63 +78,65 @@ export function createOceanGui({
 
   const waveFolder = gui.addFolder("Wave Motion");
   controllers.push(
-    waveFolder.add(settings, "displacementOctaves", 0, 40, 1),
-    waveFolder.add(settings, "normalOctaves", 0, 40, 1)
+    waveFolder.add(settings, "displacementOctaves", 0, 40, 1).onChange(runtimeChanged),
+    waveFolder.add(settings, "normalOctaves", 0, 40, 1).onChange(runtimeChanged)
   );
 
   controllers.push(
-    waveFolder.add(settings, "waveAmplitude", 0.1, 4.0, 0.01),
-    waveFolder.add(settings, "waveMean", 0.0, 1.2, 0.001),
-    waveFolder.add(settings, "dragMultiplier", 0.0, 1.0, 0.001),
-    waveFolder.add(settings, "baseFrequency", 0.1, 4.0, 0.001),
-    waveFolder.add(settings, "frequencyMultiplier", 1.01, 2.0, 0.001),
-    waveFolder.add(settings, "baseTimeMultiplier", 0.1, 6.0, 0.001),
-    waveFolder.add(settings, "timeMultiplierGrowth", 1.0, 1.4, 0.001),
-    waveFolder.add(settings, "weightDecay", 0.4, 0.98, 0.001),
-    waveFolder.add(settings, "waveDirectionSeed", -10.0, 10.0, 0.0001),
-    waveFolder.add(settings, "phaseOffset", -12.0, 12.0, 0.0001),
-    waveFolder.add(settings, "normalEpsilon", 0.01, 0.5, 0.001),
-    waveFolder.add(settings, "highFrequencyFadeDistance", 20, 2000, 1),
-    waveFolder.add(settings, "highFrequencyFadeStrength", 0.0, 1.0, 0.001)
+    waveFolder.add(settings, "waveAmplitude", 0.1, 4.0, 0.01).onChange(runtimeChanged),
+    waveFolder.add(settings, "waveMean", 0.0, 1.2, 0.001).onChange(runtimeChanged),
+    waveFolder.add(settings, "dragMultiplier", 0.0, 1.0, 0.001).onChange(runtimeChanged),
+    waveFolder.add(settings, "baseFrequency", 0.1, 4.0, 0.001).onChange(runtimeChanged),
+    waveFolder.add(settings, "frequencyMultiplier", 1.01, 2.0, 0.001).onChange(runtimeChanged),
+    waveFolder.add(settings, "baseTimeMultiplier", 0.1, 6.0, 0.001).onChange(runtimeChanged),
+    waveFolder.add(settings, "timeMultiplierGrowth", 1.0, 1.4, 0.001).onChange(runtimeChanged),
+    waveFolder.add(settings, "weightDecay", 0.4, 0.98, 0.001).onChange(runtimeChanged),
+    waveFolder.add(settings, "waveDirectionSeed", -10.0, 10.0, 0.0001).onChange(runtimeChanged),
+    waveFolder.add(settings, "phaseOffset", -12.0, 12.0, 0.0001).onChange(runtimeChanged),
+    waveFolder.add(settings, "normalEpsilon", 0.01, 0.5, 0.001).onChange(runtimeChanged),
+    waveFolder
+      .add(settings, "highFrequencyFadeDistance", 20, 2000, 1)
+      .onChange(runtimeChanged),
+    waveFolder.add(settings, "highFrequencyFadeStrength", 0.0, 1.0, 0.001).onChange(runtimeChanged)
   );
 
   const shadingFolder = gui.addFolder("Shading");
   controllers.push(
-    shadingFolder.add(settings, "fresnelBase", 0.0, 0.25, 0.001),
-    shadingFolder.add(settings, "fresnelPower", 1.0, 9.0, 0.01),
-    shadingFolder.add(settings, "reflectionStrength", 0.0, 2.4, 0.001),
-    shadingFolder.add(settings, "scatterStrength", 0.0, 2.4, 0.001),
-    shadingFolder.add(settings, "skyStrength", 0.0, 2.0, 0.001),
-    shadingFolder.add(settings, "toneMapExposure", 0.1, 4.0, 0.001),
-    shadingFolder.add(settings, "farFadeStart", 30, 2600, 1),
-    shadingFolder.add(settings, "farFadeEnd", 60, 4200, 1)
+    shadingFolder.add(settings, "fresnelBase", 0.0, 0.25, 0.001).onChange(runtimeChanged),
+    shadingFolder.add(settings, "fresnelPower", 1.0, 9.0, 0.01).onChange(runtimeChanged),
+    shadingFolder.add(settings, "reflectionStrength", 0.0, 2.4, 0.001).onChange(runtimeChanged),
+    shadingFolder.add(settings, "scatterStrength", 0.0, 2.4, 0.001).onChange(runtimeChanged),
+    shadingFolder.add(settings, "skyStrength", 0.0, 2.0, 0.001).onChange(runtimeChanged),
+    shadingFolder.add(settings, "toneMapExposure", 0.1, 4.0, 0.001).onChange(runtimeChanged),
+    shadingFolder.add(settings, "farFadeStart", 30, 2600, 1).onChange(runtimeChanged),
+    shadingFolder.add(settings, "farFadeEnd", 60, 4200, 1).onChange(runtimeChanged)
   );
 
   const colorsFolder = gui.addFolder("Colors");
   controllers.push(
-    colorsFolder.addColor(settings, "shallowColor"),
-    colorsFolder.addColor(settings, "deepColor"),
-    colorsFolder.addColor(settings, "foamColor"),
-    colorsFolder.addColor(settings, "skyHorizonColor"),
-    colorsFolder.addColor(settings, "skyZenithColor")
+    colorsFolder.addColor(settings, "shallowColor").onChange(runtimeChanged),
+    colorsFolder.addColor(settings, "deepColor").onChange(runtimeChanged),
+    colorsFolder.addColor(settings, "foamColor").onChange(runtimeChanged),
+    colorsFolder.addColor(settings, "skyHorizonColor").onChange(runtimeChanged),
+    colorsFolder.addColor(settings, "skyZenithColor").onChange(runtimeChanged)
   );
 
   const sunFolder = gui.addFolder("Sun");
   controllers.push(
-    sunFolder.add(settings, "sunIntensity", 0.0, 4.0, 0.001),
-    sunFolder.add(settings, "sunGlowPower", 20.0, 1200.0, 1.0),
-    sunFolder.add(settings, "sunGlowIntensity", 0.0, 320.0, 0.01),
-    sunFolder.add(settings, "sunElevationDeg", 2.0, 88.0, 0.1),
-    sunFolder.add(settings, "sunAzimuthDeg", -180.0, 180.0, 0.1),
-    sunFolder.add(settings, "animateSun"),
-    sunFolder.add(settings, "sunOrbitSpeed", -1.0, 1.0, 0.0001)
+    sunFolder.add(settings, "sunIntensity", 0.0, 4.0, 0.001).onChange(runtimeChanged),
+    sunFolder.add(settings, "sunGlowPower", 20.0, 1200.0, 1.0).onChange(runtimeChanged),
+    sunFolder.add(settings, "sunGlowIntensity", 0.0, 320.0, 0.01).onChange(runtimeChanged),
+    sunFolder.add(settings, "sunElevationDeg", 2.0, 88.0, 0.1).onChange(runtimeChanged),
+    sunFolder.add(settings, "sunAzimuthDeg", -180.0, 180.0, 0.1).onChange(runtimeChanged),
+    sunFolder.add(settings, "animateSun").onChange(runtimeChanged),
+    sunFolder.add(settings, "sunOrbitSpeed", -1.0, 1.0, 0.0001).onChange(runtimeChanged)
   );
 
   const foamFolder = gui.addFolder("Foam");
   controllers.push(
-    foamFolder.add(settings, "foamEnabled"),
-    foamFolder.add(settings, "foamThreshold", 0.0, 0.8, 0.001),
-    foamFolder.add(settings, "foamIntensity", 0.0, 2.0, 0.001)
+    foamFolder.add(settings, "foamEnabled").onChange(runtimeChanged),
+    foamFolder.add(settings, "foamThreshold", 0.0, 0.8, 0.001).onChange(runtimeChanged),
+    foamFolder.add(settings, "foamIntensity", 0.0, 2.0, 0.001).onChange(runtimeChanged)
   );
 
   const lodFolder = gui.addFolder("LOD & Mesh");
@@ -152,8 +154,8 @@ export function createOceanGui({
     lodFolder.add(settings, "minRadialSegments", 1, 24, 1).onFinishChange(rebuildController),
     lodFolder.add(settings, "angularSegments", 16, 768, 1).onFinishChange(rebuildController),
     lodFolder.add(settings, "detailFalloff", 0.3, 1.0, 0.001).onFinishChange(rebuildController),
-    lodFolder.add(settings, "followCameraEveryFrame").name("snapEveryFrame"),
-    lodFolder.add(settings, "followSnap", 0.05, 20.0, 0.05)
+    lodFolder.add(settings, "followCameraEveryFrame").name("snapEveryFrame").onChange(runtimeChanged),
+    lodFolder.add(settings, "followSnap", 0.05, 20.0, 0.05).onChange(runtimeChanged)
   );
 
   const timeFolder = gui.addFolder("Time");
@@ -166,8 +168,10 @@ export function createOceanGui({
 
   const debugFolder = gui.addFolder("Debug");
   controllers.push(
-    debugFolder.add(settings, "wireframe"),
-    debugFolder.add(settings, "debugView", ["none", "normals", "height", "fresnel", "rings"])
+    debugFolder.add(settings, "wireframe").onChange(runtimeChanged),
+    debugFolder
+      .add(settings, "debugView", ["none", "normals", "height", "fresnel", "rings"])
+      .onChange(runtimeChanged)
   );
 
   const actions = {

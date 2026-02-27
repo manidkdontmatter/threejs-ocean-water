@@ -2,9 +2,12 @@ import type { Camera } from "three";
 import { Vector3 } from "three";
 import { OceanSystem } from "../ocean/OceanSystem";
 import {
-  cloneDefaultSettings,
-  OCEAN_GEOMETRY_KEYS,
-  toWaveSamplingParams,
+  createDefaultOceanOptions as createDefaultOceanSettings,
+  flattenOceanConfig,
+  getOceanConfigSnapshot,
+  toOceanWaveSamplingParams,
+  type OceanConfig,
+  type OceanConfigSnapshot,
   type OceanDebugSettings,
   type OceanGeometrySettings,
   type OceanSettings,
@@ -12,7 +15,8 @@ import {
   type OceanSunSettings,
   type OceanWaveSettings,
   type WaveSamplingParams
-} from "../ocean/types";
+} from "./settings";
+import { OCEAN_GEOMETRY_REBUILD_KEYS } from "../ocean/types";
 import { sampleWaveHeight } from "../ocean/waveMath";
 
 export type OceanOptions = Partial<OceanSettings>;
@@ -23,11 +27,11 @@ export interface OceanUpdateParams {
   deltaTimeSec?: number;
 }
 
-const GEOMETRY_OPTION_KEYS = new Set<keyof OceanSettings>(OCEAN_GEOMETRY_KEYS);
+const GEOMETRY_REBUILD_KEYS = new Set<keyof OceanSettings>(OCEAN_GEOMETRY_REBUILD_KEYS);
 
 function mergeWithDefaults(options?: OceanOptions): OceanSettings {
   return {
-    ...cloneDefaultSettings(),
+    ...createDefaultOceanSettings(),
     ...(options ?? {})
   };
 }
@@ -49,8 +53,36 @@ export class Ocean {
     return { ...this.settings };
   }
 
+  getConfig(): OceanConfigSnapshot {
+    return getOceanConfigSnapshot(this.settings);
+  }
+
+  getWaveOptions(): OceanWaveSettings {
+    return this.getConfig().wave;
+  }
+
+  getShadingOptions(): OceanShadingSettings {
+    return this.getConfig().shading;
+  }
+
+  getSunOptions(): OceanSunSettings {
+    return this.getConfig().sun;
+  }
+
+  getGeometryOptions(): OceanGeometrySettings {
+    return this.getConfig().geometry;
+  }
+
+  getDebugOptions(): OceanDebugSettings {
+    return this.getConfig().debug;
+  }
+
   setOptions(options: OceanOptions): void {
     this.applyOptions(options);
+  }
+
+  setConfig(config: OceanConfig): void {
+    this.applyOptions(flattenOceanConfig(config));
   }
 
   setWaveOptions(options: Partial<OceanWaveSettings>): void {
@@ -118,7 +150,7 @@ export class Ocean {
   }
 
   getWaveSamplingParams(): WaveSamplingParams {
-    return toWaveSamplingParams(this.settings);
+    return toOceanWaveSamplingParams(this.settings);
   }
 
   sampleHeightHeadless(x: number, z: number, timeSec: number): number {
@@ -140,7 +172,7 @@ export class Ocean {
         continue;
       }
       this.settings[key] = nextValue as never;
-      if (GEOMETRY_OPTION_KEYS.has(key)) {
+      if (GEOMETRY_REBUILD_KEYS.has(key)) {
         rebuildGeometry = true;
       }
     }
@@ -156,5 +188,5 @@ export function createOcean(options?: OceanOptions): Ocean {
 }
 
 export function createDefaultOceanOptions(): OceanSettings {
-  return cloneDefaultSettings();
+  return createDefaultOceanSettings();
 }

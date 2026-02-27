@@ -178,6 +178,19 @@ export const OCEAN_GEOMETRY_KEYS = [
   "radialSegmentsDecay",
   "minRadialSegments",
   "angularSegments",
+  "detailFalloff",
+  "followSnap",
+  "followCameraEveryFrame"
+] as const satisfies ReadonlyArray<keyof OceanSettings>;
+
+export const OCEAN_GEOMETRY_REBUILD_KEYS = [
+  "ringCount",
+  "baseRingWidth",
+  "ringWidthGrowth",
+  "centerRadialSegments",
+  "radialSegmentsDecay",
+  "minRadialSegments",
+  "angularSegments",
   "detailFalloff"
 ] as const satisfies ReadonlyArray<keyof OceanSettings>;
 

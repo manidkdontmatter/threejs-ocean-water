@@ -45,6 +45,23 @@ frame();
 
 `Ocean` no longer owns pause/sim-speed/server-time policy. Keep that in your game loop and pass absolute `timeSec` (recommended), or use `deltaTimeSec` as a convenience.
 
+## Grouped Configuration API
+
+```ts
+import { Ocean } from "web-ocean-water";
+
+const ocean = new Ocean();
+
+ocean.setConfig({
+  wave: { displacementOctaves: 9, waveAmplitude: 1.4 },
+  geometry: { ringCount: 5, followSnap: 1.0 },
+  debug: { debugView: "none" }
+});
+
+const snapshot = ocean.getConfig();
+console.log(snapshot.wave.displacementOctaves);
+```
+
 ## Optional Sky
 
 ```ts
@@ -85,6 +102,13 @@ const y = sampleWaveHeight(x, z, serverTimeSec, {
   - `Ocean`
   - `createOcean`
   - `createDefaultOceanOptions`
+  - `createDefaultOceanWaveOptions`
+  - `createDefaultOceanShadingOptions`
+  - `createDefaultOceanSunOptions`
+  - `createDefaultOceanGeometryOptions`
+  - `createDefaultOceanDebugOptions`
+  - `createDefaultOceanConfig`
+  - `getOceanConfigSnapshot`
 - `web-ocean-water/math`
   - `sampleWaveHeight`
   - `sampleWaveValue`
