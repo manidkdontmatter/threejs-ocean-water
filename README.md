@@ -1,25 +1,54 @@
 # web-ocean-water Workspace
 
-This repository is split into two packages so ocean library work and demo work are isolated:
+Monorepo for a reusable Three.js ocean library and a local demo app.
 
-- `packages/web-ocean-water`: publishable npm library
-- `apps/demo`: Vite demo app and manual tuning playground
+## Projects
 
-## Workspace Commands
+- `packages/web-ocean-water`: publishable npm package (`web-ocean-water`).
+- `apps/demo`: Vite sandbox that exercises ocean rendering, sky rendering, and Rapier buoyancy.
+- `docs`: repository-level API/settings/integration reference.
 
-Run from repo root:
+## Library Summary
+
+`web-ocean-water` provides:
+
+- GPU ocean rendering with concentric ring LOD geometry.
+- Deterministic wave math sampling for gameplay/server logic.
+- Optional sky dome (`web-ocean-water/sky`).
+- Optional Rapier buoyancy adapter (`web-ocean-water/rapier`).
+
+## Quick Start (Workspace)
+
+Run from repository root:
 
 ```bash
 npm install
 npm run dev
-npm run build
-npm run typecheck
 ```
 
-- `npm run dev` runs the demo app.
-- `npm run build` builds library first, then demo.
-- `npm run typecheck` checks both packages.
+This starts the demo app in `apps/demo`.
 
-Library docs and API usage live in:
+## Workspace Commands
 
-- `packages/web-ocean-water/README.md`
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Runs the demo app. |
+| `npm run preview` | Previews the demo production build. |
+| `npm run build` | Builds the library, then builds the demo. |
+| `npm run build:lib` | Builds only `packages/web-ocean-water`. |
+| `npm run build:demo` | Builds only `apps/demo`. |
+| `npm run typecheck` | Runs TypeScript checks for library and demo. |
+| `npm run test:follow-snap` | Runs the demo follow-mode regression script. |
+
+## Documentation Map
+
+- Package consumer guide: `packages/web-ocean-water/README.md`
+- API reference: `docs/api-reference.md`
+- Settings/defaults reference: `docs/settings-reference.md`
+- Integration patterns and caveats: `docs/integration-notes.md`
+
+## Notes
+
+- The library is built with `tsup` and ships ESM + CJS + type declarations.
+- `three` is a peer dependency of the package.
+- `@dimforge/rapier3d-compat` is an optional peer dependency used only for the Rapier adapter subpath.
